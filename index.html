@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Buddy Configurator — AI Fluency</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+
+  :root {
+    --ink: #0E0E12;
+    --paper: #F5F2ED;
+    --cream: #EDE9E1;
+    --amber: #D47C10;
+    --amber-light: #F9EDD4;
+    --amber-bright: #F2A92B;
+    --teal: #0B7B6E;
+    --teal-light: #D4EDEA;
+    --rose: #C1395A;
+    --rose-light: #F5DBE1;
+    --violet: #5B3FA6;
+    --violet-light: #E5DFFA;
+    --mid: #6B6860;
+    --border: #DDD9D0;
+    --white: #FFFEFB;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--ink);
+    padding: 28px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--white);
+    letter-spacing: -0.02em;
+  }
+  .logo em {
+    font-style: normal;
+    color: var(--amber-bright);
+  }
+  .header-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    background: var(--ink);
+    padding: 64px 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -120px; right: -80px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(212,124,16,0.18) 0%, transparent 65%);
+    border-radius: 50%;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 30%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(11,123,110,0.12) 0%, transparent 65%);
+    border-radius: 50%;
+  }
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(212,124,16,0.2);
+    border: 1px solid rgba(212,124,16,0.35);
+    color: var(--amber-bright);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(36px, 5vw, 58px);
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    max-width: 720px;
+    margin-bottom: 20px;
+    position: relative; z-index: 1;
+  }
+  .hero h1 span { color: var(--amber-bright); }
+  .hero p {
+    color: rgba(255,255,255,0.55);
+    font-size: 17px;
+    max-width: 540px;
+    line-height: 1.65;
+    position: relative; z-index: 1;
+  }
+
+  /* ── Steps bar ── */
+  .steps-bar {
+    background: var(--cream);
+    border-bottom: 1px solid var(--border);
+    padding: 0 48px;
+    display: flex;
+    gap: 0;
+  }
+  .step-tab {
+    padding: 18px 24px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--mid);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .step-tab:hover { color: var(--ink); }
+  .step-tab.active {
+    color: var(--amber);
+    border-bottom-color: var(--amber);
+    font-weight: 500;
+  }
+  .step-tab.done {
+    color: var(--teal);
+  }
+  .step-tab.done::before {
+    content: '✓ ';
+    font-size: 10px;
+  }
+
+  /* ── Main layout ── */
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 40px;
+    align-items: start;
+  }
+
+  /* ── Sections ── */
+  .config-section {
+    display: none;
+  }
+  .config-section.active {
+    display: block;
+    animation: fadeUp 0.35s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .section-desc {
+    color: var(--mid);
+    font-size: 15px;
+    margin-bottom: 32px;
+    line-height: 1.6;
+  }
+
+  /* ── Form elements ── */
+  .field-group {
+    margin-bottom: 28px;
+  }
+  label {
+    display: block;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+  label .sublabel {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--mid);
+    margin-left: 6px;
+  }
+
+  input[type="text"], textarea, select {
+    width: 100%;
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input[type="text"]:focus, textarea:focus, select:focus {
+    border-color: var(--amber);
+  }
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.6;
+  }
+
+  /* ── Toggle chips ── */
+  .chip-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .chip {
+    padding: 9px 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 50px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.18s;
+    background: var(--white);
+    color: var(--ink);
+    user-select: none;
+    font-weight: 400;
+  }
+  .chip:hover {
+    border-color: var(--amber);
+    color: var(--amber);
+  }
+  .chip.selected {
+    background: var(--amber-light);
+    border-color: var(--amber);
+    color: var(--amber);
+    font-weight: 500;
+  }
+  .chip.selected-teal {
+    background: var(--teal-light);
+    border-color: var(--teal);
+    color: var(--teal);
+    font-weight: 500;
+  }
+  .chip.selected-violet {
+    background: var(--violet-light);
+    border-color: var(--violet);
+    color: var(--violet);
+    font-weight: 500;
+  }
+
+  /* ── Protocol cards ── */
+  .protocol-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .protocol-card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .protocol-card:hover {
+    border-color: var(--amber);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  }
+  .protocol-card.selected {
+    border-color: var(--amber);
+    background: var(--amber-light);
+  }
+  .protocol-icon {
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+  .protocol-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .protocol-desc {
+    font-size: 12px;
+    color: var(--mid);
+    line-height: 1.5;
+  }
+
+  /* ── Slider ── */
+  .slider-track {
+    position: relative;
+    margin-top: 8px;
+  }
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--amber);
+    height: 4px;
+    cursor: pointer;
+  }
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--mid);
+    margin-top: 6px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── Navigation ── */
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 40px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+  }
+  .btn {
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--mid);
+    border: 1.5px solid var(--border);
+  }
+  .btn-ghost:hover { border-color: var(--ink); color: var(--ink); }
+  .btn-primary {
+    background: var(--amber);
+    color: white;
+  }
+  .btn-primary:hover {
+    background: var(--amber-bright);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(212,124,16,0.35);
+  }
+  .btn-teal {
+    background: var(--teal);
+    color: white;
+  }
+  .btn-teal:hover {
+    background: #0a6d62;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(11,123,110,0.35);
+  }
+
+  /* ── Sidebar preview ── */
+  .sidebar {
+    position: sticky;
+    top: 32px;
+  }
+  .preview-card {
+    background: var(--ink);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .preview-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .preview-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+  }
+  .preview-dot.amber { background: var(--amber-bright); }
+  .preview-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-left: 4px;
+  }
+  .preview-body {
+    padding: 24px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.75;
+    color: rgba(255,255,255,0.75);
+    min-height: 300px;
+    max-height: 480px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+  }
+  .preview-body .highlight { color: var(--amber-bright); }
+  .preview-body .section-kw { color: #93C5FD; }
+  .preview-body .comment { color: rgba(255,255,255,0.3); }
+
+  .copy-bar {
+    padding: 16px 24px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    gap: 10px;
+  }
+  .btn-copy {
+    flex: 1;
+    padding: 10px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    color: rgba(255,255,255,0.8);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-copy:hover {
+    background: rgba(212,124,16,0.2);
+    border-color: rgba(212,124,16,0.4);
+    color: var(--amber-bright);
+  }
+  .btn-copy.copied {
+    background: rgba(11,123,110,0.2);
+    border-color: var(--teal);
+    color: #6EE7B7;
+  }
+
+  /* ── Output section ── */
+  .output-box {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .output-topbar {
+    background: var(--cream);
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .output-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--mid);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .output-text {
+    padding: 24px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--ink);
+    white-space: pre-wrap;
+    max-height: 500px;
+    overflow-y: auto;
+  }
+
+  /* ── Complete screen ── */
+  .complete-hero {
+    text-align: center;
+    padding: 48px 0 32px;
+  }
+  .complete-icon {
+    font-size: 56px;
+    margin-bottom: 20px;
+  }
+  .complete-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  .complete-desc {
+    color: var(--mid);
+    font-size: 16px;
+    max-width: 560px;
+    margin: 0 auto 40px;
+    line-height: 1.6;
+  }
+
+  .how-to-use {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 28px;
+  }
+  .how-to-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .how-to-step {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 14px;
+    align-items: flex-start;
+  }
+  .step-num {
+    width: 28px; height: 28px;
+    background: var(--ink);
+    color: var(--white);
+    border-radius: 50%;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-text {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--mid);
+    padding-top: 4px;
+  }
+  .step-text strong { color: var(--ink); }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media (max-width: 900px) {
+    main { grid-template-columns: 1fr; padding: 32px 24px; }
+    .sidebar { display: none; }
+    .protocol-grid { grid-template-columns: 1fr; }
+    header, .hero, .steps-bar { padding-left: 24px; padding-right: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">AI <em>Fluency</em></div>
+  <div class="header-tag">Study Buddy Configurator</div>
+</header>
+
+<div class="hero">
+  <div class="hero-eyebrow">🎓 Anthropic AI Fluency Course</div>
+  <h1>Configure Your<br><span>Study Buddy</span></h1>
+  <p>Build a personalised AI learning partner that guides you through discovery — not one that just gives you answers.</p>
+</div>
+
+<div class="steps-bar" id="stepsBar">
+  <div class="step-tab active" data-step="0">01 · Profile</div>
+  <div class="step-tab" data-step="1">02 · Learning Style</div>
+  <div class="step-tab" data-step="2">03 · Protocols</div>
+  <div class="step-tab" data-step="3">04 · Boundaries</div>
+  <div class="step-tab" data-step="4">05 · Generate</div>
+</div>
+
+<main>
+  <div class="config-panel">
+
+    <!-- STEP 0: Profile -->
+    <div class="config-section active" id="step-0">
+      <div class="section-title">Your Learning Profile</div>
+      <div class="section-desc">Help your Study Buddy understand who you are and what you're working towards.</div>
+
+      <div class="field-group">
+        <label>Your Name <span class="sublabel">— how should it address you?</span></label>
+        <input type="text" id="studentName" placeholder="e.g. Priya" />
+      </div>
+
+      <div class="field-group">
+        <label>Course / Subject <span class="sublabel">— what are you studying?</span></label>
+        <input type="text" id="courseName" placeholder="e.g. AI Fluency by Anthropic" />
+      </div>
+
+      <div class="field-group">
+        <label>Your Goal <span class="sublabel">— what does success look like?</span></label>
+        <textarea id="learningGoal" placeholder="e.g. I want to deeply understand how AI works so I can use it confidently at work and pass the course assessment."></textarea>
+      </div>
+
+      <div class="field-group">
+        <label>Current Knowledge Level</label>
+        <div class="chip-grid" id="levelChips">
+          <div class="chip" data-val="complete beginner">Complete Beginner</div>
+          <div class="chip" data-val="some background">Some Background</div>
+          <div class="chip" data-val="intermediate">Intermediate</div>
+          <div class="chip" data-val="advanced">Advanced</div>
+        </div>
+      </div>
+
+      <div class="nav-row">
+        <span></span>
+        <button class="btn btn-primary" onclick="goToStep(1)">Next: Learning Style →</button>
+      </div>
+    </div>
+
+    <!-- STEP 1: Learning Style -->
+    <div class="config-section" id="step-1">
+      <div class="section-title">Learning Style Preferences</div>
+      <div class="section-desc">Tell the Study Buddy how you learn best so it can adapt its approach.</div>
+
+      <div class="field-group">
+        <label>How do you prefer to encounter new concepts?</label>
+        <div class="chip-grid" id="styleChips">
+          <div class="chip" data-val="examples first, then theory">Examples first, then theory</div>
+          <div class="chip" data-val="theory first, then examples">Theory first, then examples</div>
+          <div class="chip" data-val="analogies and stories">Analogies & stories</div>
+          <div class="chip" data-val="diagrams and visuals described">Diagrams & visuals described</div>
+          <div class="chip" data-val="step-by-step breakdowns">Step-by-step breakdowns</div>
+          <div class="chip" data-val="Socratic questioning">Socratic questioning</div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>What energises you when you're stuck?</label>
+        <div class="chip-grid" id="stuckChips">
+          <div class="chip" data-val="a gentle hint to point me in the right direction">A gentle hint</div>
+          <div class="chip" data-val="a series of smaller sub-questions to scaffold my thinking">Scaffolding questions</div>
+          <div class="chip" data-val="encouragement to just try something and see">Encouragement to try</div>
+          <div class="chip" data-val="a reframing of the problem from a different angle">Reframe the problem</div>
+          <div class="chip" data-val="connecting it to something I already know">Connect to prior knowledge</div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>Preferred feedback tone</label>
+        <div class="chip-grid" id="toneChips">
+          <div class="chip" data-val="warm and encouraging">Warm & encouraging</div>
+          <div class="chip" data-val="direct and concise">Direct & concise</div>
+          <div class="chip" data-val="Socratic and curious">Socratic & curious</div>
+          <div class="chip" data-val="playful and light-hearted">Playful & light-hearted</div>
+          <div class="chip" data-val="professional and rigorous">Professional & rigorous</div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>How much guidance before answering questions? <span class="sublabel">— drag to set</span></label>
+        <div class="slider-track">
+          <input type="range" id="guidanceSlider" min="1" max="5" value="3" />
+          <div class="slider-labels">
+            <span>Lots of hints first</span>
+            <span>Straight to answer</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn btn-ghost" onclick="goToStep(0)">← Back</button>
+        <button class="btn btn-primary" onclick="goToStep(2)">Next: Protocols →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Protocols -->
+    <div class="config-section" id="step-2">
+      <div class="section-title">Study Protocols</div>
+      <div class="section-desc">Select all the modes you want your Study Buddy to support. It will know exactly how to behave when you invoke each one.</div>
+
+      <div class="protocol-grid" id="protocolGrid">
+        <div class="protocol-card" data-proto="problem-solving">
+          <div class="protocol-icon">🧩</div>
+          <div class="protocol-name">Problem-Solving</div>
+          <div class="protocol-desc">Guide with hints and questions — never solve it for me</div>
+        </div>
+        <div class="protocol-card" data-proto="concept-review">
+          <div class="protocol-icon">📚</div>
+          <div class="protocol-name">Concept Review</div>
+          <div class="protocol-desc">Test understanding with progressively harder questions</div>
+        </div>
+        <div class="protocol-card" data-proto="exam-prep">
+          <div class="protocol-icon">📝</div>
+          <div class="protocol-name">Exam Prep</div>
+          <div class="protocol-desc">Quiz me and explain why wrong answers are wrong</div>
+        </div>
+        <div class="protocol-card" data-proto="writing">
+          <div class="protocol-icon">✍️</div>
+          <div class="protocol-name">Writing Support</div>
+          <div class="protocol-desc">Help develop my own arguments through questioning</div>
+        </div>
+        <div class="protocol-card" data-proto="reading">
+          <div class="protocol-icon">🔍</div>
+          <div class="protocol-name">Reading Comprehension</div>
+          <div class="protocol-desc">Ask me to explain key concepts in my own words</div>
+        </div>
+        <div class="protocol-card" data-proto="general-planning">
+          <div class="protocol-icon">🗓️</div>
+          <div class="protocol-name">General Planning</div>
+          <div class="protocol-desc">Gather info about my commitments to plan coursework</div>
+        </div>
+        <div class="protocol-card" data-proto="assignment-planning">
+          <div class="protocol-icon">🎯</div>
+          <div class="protocol-name">Assignment Planning</div>
+          <div class="protocol-desc">Test my understanding of the brief before I start</div>
+        </div>
+        <div class="protocol-card" data-proto="reflection">
+          <div class="protocol-icon">🪞</div>
+          <div class="protocol-name">Reflection</div>
+          <div class="protocol-desc">Help me consolidate what I've learned in a session</div>
+        </div>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn btn-ghost" onclick="goToStep(1)">← Back</button>
+        <button class="btn btn-primary" onclick="goToStep(3)">Next: Boundaries →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Boundaries -->
+    <div class="config-section" id="step-3">
+      <div class="section-title">Rules & Boundaries</div>
+      <div class="section-desc">Set clear rules so your Study Buddy stays in the role of guide — not answer machine.</div>
+
+      <div class="field-group">
+        <label>Core learning rules <span class="sublabel">— select all that apply</span></label>
+        <div class="chip-grid" id="rulesChips">
+          <div class="chip" data-val="Always ask what I am trying to learn before helping">Always ask what I'm trying to learn first</div>
+          <div class="chip" data-val="Never give direct answers to assessment questions">Never answer assessment questions directly</div>
+          <div class="chip" data-val="Check my understanding before introducing new concepts">Check understanding before new concepts</div>
+          <div class="chip" data-val="Remind me to make my own notes rather than copying AI output">Remind me to make my own notes</div>
+          <div class="chip" data-val="Point out connections to things I have previously studied">Point out connections to prior learning</div>
+          <div class="chip" data-val="Provide practice problems that build on what I am currently studying">Provide building-block practice problems</div>
+          <div class="chip" data-val="If I seem to be going in circles, gently flag this and suggest a different strategy">Flag when I'm going in circles</div>
+          <div class="chip" data-val="Periodically summarise what I seem to have understood well and what still needs work">Periodically summarise my progress</div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>Anything specific to avoid? <span class="sublabel">— optional</span></label>
+        <textarea id="avoidText" placeholder="e.g. Don't use jargon without explaining it. Don't give me more than one question at a time."></textarea>
+      </div>
+
+      <div class="field-group">
+        <label>Anything else to add? <span class="sublabel">— personal context, constraints, preferences</span></label>
+        <textarea id="extraContext" placeholder="e.g. I study best in short 25-minute bursts. I'm preparing for a professional role in AI product management."></textarea>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn btn-ghost" onclick="goToStep(2)">← Back</button>
+        <button class="btn btn-teal" onclick="generate()">✦ Generate My Study Buddy →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Output -->
+    <div class="config-section" id="step-4">
+      <div class="complete-hero">
+        <div class="complete-icon">🎓</div>
+        <div class="complete-title">Your Study Buddy is Ready</div>
+        <div class="complete-desc">Copy the prompt below and paste it as a <strong>Custom Instructions</strong> or opening message in a new Claude conversation. Your personalised learning partner is configured.</div>
+      </div>
+
+      <div class="output-box">
+        <div class="output-topbar">
+          <span class="output-label">System Prompt — Copy & Use in Claude</span>
+          <button class="btn btn-ghost" style="font-size:13px; padding:7px 16px;" id="copyBtnMain" onclick="copyPrompt('copyBtnMain')">Copy</button>
+        </div>
+        <div class="output-text" id="finalOutput">Generating your prompt…</div>
+      </div>
+
+      <div class="how-to-use" style="margin-top:28px;">
+        <div class="how-to-title">How to use this prompt</div>
+        <div class="how-to-step">
+          <div class="step-num">1</div>
+          <div class="step-text"><strong>Copy</strong> the prompt above using the button.</div>
+        </div>
+        <div class="how-to-step">
+          <div class="step-num">2</div>
+          <div class="step-text">Open <strong>Claude.ai → Settings → Custom Instructions</strong> and paste it there for persistent use across all conversations, <em>or</em> paste it as your very first message in a new chat.</div>
+        </div>
+        <div class="how-to-step">
+          <div class="step-num">3</div>
+          <div class="step-text">Start a session by saying something like: <strong>"I want to do a [protocol name] session on [topic]."</strong> Your Study Buddy will take it from there.</div>
+        </div>
+        <div class="how-to-step">
+          <div class="step-num">4</div>
+          <div class="step-text">You can always <strong>switch protocols mid-conversation</strong> by simply naming the mode — e.g. "Let's switch to Exam Prep mode."</div>
+        </div>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn btn-ghost" onclick="goToStep(3)">← Edit Settings</button>
+        <button class="btn btn-primary" onclick="copyPrompt('copyBtnMain')">Copy Prompt</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Sidebar Preview -->
+  <div class="sidebar">
+    <div class="preview-card">
+      <div class="preview-header">
+        <div class="preview-dot amber"></div>
+        <div class="preview-dot"></div>
+        <div class="preview-dot"></div>
+        <div class="preview-title">Live Preview</div>
+      </div>
+      <div class="preview-body" id="previewBody">
+<span class="comment">// Your personalised prompt
+// will appear here as you fill
+// in the form…</span>
+      </div>
+      <div class="copy-bar">
+        <button class="btn-copy" id="sidebarCopy" onclick="copyPrompt('sidebarCopy')">Copy Prompt</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  let currentStep = 0;
+  const totalSteps = 5;
+
+  // ── State ──
+  const state = {
+    name: '', course: '', goal: '',
+    level: '', styles: [], stuckPref: [],
+    tone: '', guidance: 3,
+    protocols: [], rules: [],
+    avoid: '', extra: ''
+  };
+
+  // ── Single-select chips ──
+  function initSingleChips(containerId, stateKey) {
+    document.getElementById(containerId).querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.getElementById(containerId).querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+        state[stateKey] = chip.dataset.val;
+        updatePreview();
+      });
+    });
+  }
+
+  // ── Multi-select chips ──
+  function initMultiChips(containerId, stateArr) {
+    document.getElementById(containerId).querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const val = chip.dataset.val;
+        const idx = stateArr.indexOf(val);
+        if (idx > -1) { stateArr.splice(idx, 1); chip.classList.remove('selected'); }
+        else { stateArr.push(val); chip.classList.add('selected'); }
+        updatePreview();
+      });
+    });
+  }
+
+  // ── Protocol cards ──
+  document.getElementById('protocolGrid').querySelectorAll('.protocol-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const val = card.dataset.proto;
+      const idx = state.protocols.indexOf(val);
+      if (idx > -1) { state.protocols.splice(idx, 1); card.classList.remove('selected'); }
+      else { state.protocols.push(val); card.classList.add('selected'); }
+      updatePreview();
+    });
+  });
+
+  // ── Inputs ──
+  document.getElementById('studentName').addEventListener('input', e => { state.name = e.target.value; updatePreview(); });
+  document.getElementById('courseName').addEventListener('input', e => { state.course = e.target.value; updatePreview(); });
+  document.getElementById('learningGoal').addEventListener('input', e => { state.goal = e.target.value; updatePreview(); });
+  document.getElementById('guidanceSlider').addEventListener('input', e => { state.guidance = parseInt(e.target.value); updatePreview(); });
+  document.getElementById('avoidText').addEventListener('input', e => { state.avoid = e.target.value; updatePreview(); });
+  document.getElementById('extraContext').addEventListener('input', e => { state.extra = e.target.value; updatePreview(); });
+
+  initSingleChips('levelChips', 'level');
+  initSingleChips('toneChips', 'tone');
+  initMultiChips('styleChips', state.styles);
+  initMultiChips('stuckChips', state.stuckPref);
+  initMultiChips('rulesChips', state.rules);
+
+  // ── Generate prompt ──
+  function buildPrompt() {
+    const name = state.name || 'the student';
+    const course = state.course || 'their course';
+    const guidanceLabels = ['immediately move towards the answer', 'lean towards giving answers relatively quickly', 'balance hints and direct answers', 'prioritise extended questioning and hints before answering', 'never give direct answers — guide entirely through questions and hints'];
+    const guidanceDesc = guidanceLabels[state.guidance - 1];
+
+    const protoDescriptions = {
+      'problem-solving': 'PROBLEM-SOLVING MODE: Guide with progressive hints and questions only. Never solve the problem outright. Ask "What have you tried so far?" and "What does that tell you?" before any hint.',
+      'concept-review': 'CONCEPT REVIEW MODE: Begin by asking what the student thinks they know. Use progressively harder questions to probe depth. Identify gaps and address them through questions, not lectures.',
+      'exam-prep': 'EXAM PREP MODE: Present questions as an examiner would. After each answer, explain precisely why wrong answers are wrong and why correct answers are correct. Vary question difficulty.',
+      'writing': 'WRITING SUPPORT MODE: Never write for the student. Instead, ask questions that draw out their own arguments: "What is your central claim?" / "What evidence supports this?" / "What would a critic say?"',
+      'reading': 'READING COMPREHENSION MODE: After the student reads, ask them to explain key concepts in their own words. Ask probing questions to deepen understanding. Avoid paraphrasing the text for them.',
+      'general-planning': 'GENERAL PLANNING MODE: Begin by gathering information — ask about all current commitments, deadlines, available study time, and competing priorities before helping create any plan.',
+      'assignment-planning': 'ASSIGNMENT PLANNING MODE: Before any planning, test the student\'s understanding of the assignment brief with probing questions. Only proceed when they can explain the requirements in their own words.',
+      'reflection': 'REFLECTION MODE: Guide the student to articulate what they\'ve learned. Ask: "What was new to you today?" / "What are you still uncertain about?" / "How does this connect to what you knew before?"'
+    };
+
+    let prompt = `# Study Buddy — Personalised Learning Partner
+
+## Identity & Purpose
+You are a dedicated Study Buddy for ${name}, who is studying ${course}. Your sole purpose is to support genuine learning — never to complete work on the student's behalf. You are a thinking partner, not an answer machine.
+
+**Student's goal:** ${state.goal || 'To deeply understand the course material and develop lasting knowledge.'}
+**Knowledge level:** ${state.level || 'Not specified — assess through conversation.'}
+
+---
+
+## Core Behaviour Rules
+These rules apply in EVERY interaction, regardless of mode:
+
+1. **Understand before helping.** Always begin by asking what the student is trying to learn or understand. Do not jump straight into content.
+2. **Questions over answers.** Default to asking questions that guide the student towards understanding. Reserve direct explanations for concepts they genuinely cannot reach through prompting.
+3. **Check understanding.** Before introducing a new concept, verify the student has understood the current one. Ask them to explain it back.
+4. **Build on prior knowledge.** Actively point out connections to things the student has already studied or knows.
+5. **Guidance level:** ${guidanceDesc}.
+${state.rules.length > 0 ? '\n**Additional rules selected by the student:**\n' + state.rules.map(r => `- ${r}`).join('\n') : ''}
+
+---
+
+## Communication Style
+${state.tone ? `**Tone:** ${state.tone}.` : ''}
+${state.styles.length > 0 ? `**How this student learns:** ${state.styles.join(', ')}.` : ''}
+${state.stuckPref.length > 0 ? `**When stuck, this student prefers:** ${state.stuckPref.join(', ')}.` : ''}
+
+Keep responses focused and appropriately concise. Ask only one question at a time. Avoid overwhelming the student with multiple questions or too much information at once.
+
+---
+
+## Study Protocols
+When the student invokes a mode (e.g. "let's do exam prep" or "problem-solving session"), switch into that protocol:
+
+${state.protocols.length > 0 ? state.protocols.map(p => protoDescriptions[p]).join('\n\n') : '— No specific protocols selected. Use good judgement and ask the student which type of help they need.'}
+
+---
+
+## What to Avoid
+${state.avoid ? state.avoid + '\n' : ''}
+- Never write essays, assignments, or structured answers the student could submit as their own work.
+- Never give away an answer the student is actively trying to work out.
+- Never skip the "what are you trying to learn?" check at the start of a new topic.
+- Do not overwhelm with information — pace the session to the student's responses.
+
+---
+${state.extra ? `\n## Additional Context\n${state.extra}\n\n---` : ''}
+
+## Opening a Session
+When the student starts a conversation, begin with:
+*"Hi ${name}! Ready to dig in. What are we working on today, and what are you hoping to understand by the end of this session?"*
+
+Then wait for their answer before doing anything else.`;
+
+    return prompt;
+  }
+
+  function updatePreview() {
+    const prompt = buildPrompt();
+    const preview = document.getElementById('previewBody');
+    // Syntax-highlight preview
+    let html = prompt
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/(#{1,3} .+)/g, '<span class="section-kw">$1</span>')
+      .replace(/\*\*(.+?)\*\*/g, '<span class="highlight">$1</span>');
+    preview.innerHTML = html;
+  }
+
+  function generate() {
+    goToStep(4);
+    const prompt = buildPrompt();
+    document.getElementById('finalOutput').textContent = prompt;
+    updatePreview();
+  }
+
+  function copyPrompt(btnId) {
+    const text = buildPrompt();
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById(btnId);
+      const orig = btn.textContent;
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  function goToStep(n) {
+    document.getElementById(`step-${currentStep}`).classList.remove('active');
+    document.getElementById(`step-${n}`).classList.add('active');
+
+    document.querySelectorAll('.step-tab').forEach((tab, i) => {
+      tab.classList.remove('active', 'done');
+      if (i === n) tab.classList.add('active');
+      else if (i < n) tab.classList.add('done');
+    });
+
+    currentStep = n;
+    updatePreview();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Init preview
+  updatePreview();
+</script>
+</body>
+</html>
