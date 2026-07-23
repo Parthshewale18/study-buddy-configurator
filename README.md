@@ -1,7 +1,3 @@
-# Study-Buddy-Configurator
-
-AI Study Buddy Configurator
-
 # Study Buddy Configurator
 
 A single-page tool that generates a personalised Claude system prompt for AI-assisted studying — built during Anthropic's AI Fluency course.
